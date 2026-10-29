@@ -13,7 +13,24 @@
 <aside class="sidebar"><div class="brand">DOMINATE <span>THE WORLD</span><div class="sub">TOWER DEFENSE // MVP</div></div>
 <button class="nav active" data-tab="Battle">⚔ Battle</button><button class="nav" data-tab="Characters">✦ Characters</button><button class="nav" data-tab="Monsters">☠ Monsters</button><button class="nav" data-tab="Map Editor">⌖ Map Editor</button><button class="nav" data-tab="Campaign">▤ Campaign</button><button class="nav" data-tab="Collection">♜ Collection</button><button class="nav" data-tab="Settings">⚙ Settings</button><div class="sidefoot">Build your world.<br>Defend your realm.</div></aside>
 <main class="main"><header class="topbar"><div><h1 id="pageTitle">Battlefield</h1><div class="sub" id="pageSub">Deploy units. Survive 12 waves. Protect the goal.</div></div><div class="resources"><span class="pill">✧ <b id="topGems">0</b> shards</span><span class="pill">🏆 <b id="topWins">0</b> wins</span><button id="exportBtn">Export Project</button><button id="importBtn">Import</button><input id="importFile" type="file" accept=".json,application/json" hidden></div></header>
-<div id="toast" class="toast hidden"></div><section id="view"></section></main></div>
+<div id="toast" class="toast hidden"></div>
+
+<div id="account-panel" style="padding:12px;margin:12px 0;border:1px solid #444;border-radius:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+  <input id="auth-email" type="email" placeholder="Email" autocomplete="email" style="padding:10px;min-width:180px;flex:1">
+  <input id="auth-password" type="password" placeholder="Mật khẩu" autocomplete="current-password" style="padding:10px;min-width:150px;flex:1">
+  <button id="auth-register" type="button">Đăng ký</button>
+  <button id="auth-login" type="button">Đăng nhập</button>
+  <button id="auth-logout" type="button" hidden>Đăng xuất</button>
+  <span id="auth-status" style="width:100%;font-size:13px">Chưa đăng nhập</span>
+</div>
+
+<section id="view"></section></main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const COLORS={Hỏa:'#ff765f',Thủy:'#55c8ff',Thổ:'#c8a879',Mộc:'#75e69c',Băng:'#a4f2ff',Lôi:'#f9e46b',Kim:'#d5dbe9',Phong:'#b2ffd8',Quang:'#fff0a6',Ảnh:'#bc8bff'};
+const DEFAULTS={
 <script>
 (()=>{'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
