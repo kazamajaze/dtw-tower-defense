@@ -7,7 +7,7 @@ const passwordInput=document.querySelector('#auth-password');
 const registerBtn=document.querySelector('#auth-register');
 const loginBtn=document.querySelector('#auth-login');
 const logoutBtn=document.querySelector('#auth-logout');
-if(!window.supabase||!status||!emailInput||!passwordInput||!registerBtn||!loginBtn||!logoutBtn)return;
+if(!status||!emailInput||!passwordInput||!registerBtn||!loginBtn||!logoutBtn)return;if(!window.supabase){status.textContent='Không tải được thư viện đăng nhập. Hãy tải lại trang hoặc thử mạng khác.';status.style.color='#ff9ab0';registerBtn.disabled=true;loginBtn.disabled=true;return;}
 const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MIGRATION_KEY='dtwtd_cloud_migrated_v1';
 let currentUser=null,saveTimer=null,lastPayload=null,syncingUserId=null,syncedUserId=null,readyUserId=null,currentRole='player';
