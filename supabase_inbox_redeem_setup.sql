@@ -91,7 +91,7 @@ begin
  if not found or character_id is null then raise exception 'No character gift in this message'; end if;
  insert into public.inbox_message_claims(message_id,user_id) values(p_message_id,auth.uid());
  return character_id;
-exception when unique_violation then raise exception 'You already claimed this character'; eend $$;
+exception when unique_violation then raise exception 'You already claimed this character'; end $$;
 revoke all on function public.claim_inbox_character(uuid) from public,anon;
 grant execute on function public.claim_inbox_character(uuid) to authenticated;
 revoke all on function public.redeem_game_code(text) from public,anon;
