@@ -83,7 +83,7 @@ revoke all on function public.send_broadcast_mail(text,text,text) from public,an
 grant execute on function public.send_broadcast_mail(text,text,text) to authenticated;
 
 create or replace function public.claim_inbox_character(p_message_id uuid)
-returns text language plpgsql security definer set search_path=public,auth as $
+returns text language plpgsql security definer set search_path=public,auth as $$
 declare character_id text;
 begin
  if auth.uid() is null then raise exception 'Sign in first'; end if;
@@ -91,7 +91,7 @@ begin
  if not found or character_id is null then raise exception 'No character gift in this message'; end if;
  insert into public.inbox_message_claims(message_id,user_id) values(p_message_id,auth.uid());
  return character_id;
-exception when unique_violation then raise exception 'You already claimed this character'; end $;
+exception when unique_violation then raise exception 'You already claimed this character'; end$$;
 revoke all on function public.claim_inbox_character(uuid) from public,anon;
 grant execute on function public.claim_inbox_character(uuid) to authenticated;
 revoke all on function public.redeem_game_code(text) from public,anon;
