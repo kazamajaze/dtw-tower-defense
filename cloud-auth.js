@@ -10,9 +10,9 @@ const logoutBtn=document.querySelector('#auth-logout');
 if(!window.supabase||!status||!emailInput||!passwordInput||!registerBtn||!loginBtn||!logoutBtn)return;
 const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MIGRATION_KEY='dtwtd_cloud_migrated_v1';
-let currentUser=null,saveTimer=null,lastPayload=null,syncingUserId=null,syncedUserId=null;
+let currentUser=null,saveTimer=null,lastPayload=null,syncingUserId=null,syncedUserId=null,readyUserId=null;
 function message(text,ok=false){status.textContent=text;status.style.color=ok?'#67e8b0':'#ff9ab0'}
-function showSession(session){const signedIn=!!session;currentUser=session?.user||null;logoutBtn.hidden=!signedIn;registerBtn.hidden=signedIn;loginBtn.hidden=signedIn;emailInput.hidden=signedIn;passwordInput.hidden=signedIn;message(signedIn?'Đã đăng nhập: '+(session.user.email||'tài khoản'):'Chưa đăng nhập',signedIn);if(signedIn)syncFromCloud()}
+function showSession(session){const signedIn=!!session,nextUser=session?.user||null;if(currentUser?.id!==nextUser?.id){clearTimeout(saveTimer);lastPayload=null;readyUserId=null;syncedUserId=null}currentUser=nextUser;logoutBtn.hidden=!signedIn;registerBtn.hidden=signedIn;loginBtn.hidden=signedIn;emailInput.hidden=signedIn;passwordInput.hidden=signedIn;message(signedIn?'Đã đăng nhập: '+(session.user.email||'tài khoản'):'Chưa đăng nhập',signedIn);if(signedIn)syncFromCloud()}
 async function syncFromCloud(){
  const user=currentUser;if(!user||syncingUserId===user.id||syncedUserId===user.id)return;
  syncingUserId=user.id;
@@ -37,7 +37,7 @@ async function syncFromCloud(){
    try{localStorage.setItem(MIGRATION_KEY,user.id)}catch(e){}
    message(migratedFor?'Đã tạo dữ liệu riêng mới cho tài khoản này.':'Đã chuyển tiến trình trên thiết bị vào tài khoản đầu tiên.',true);
   }
-  syncedUserId=user.id;
+  syncedUserId=user.id;readyUserId=user.id;
  }catch(e){message('Chưa đồng bộ được dữ liệu: '+(e.message||'hãy kiểm tra quyền lưu'))}
  finally{if(syncingUserId===user.id)syncingUserId=null}
 }
@@ -47,15 +47,15 @@ async function writeSave(payload,userId=currentUser?.id){
  if(error)throw error;
 }
 async function flushSave(){
- const userId=currentUser?.id,payload=lastPayload;if(!userId||!payload)return;
+ const userId=currentUser?.id,payload=lastPayload;if(!userId||readyUserId!==userId||!payload)return;
  try{await writeSave(payload,userId);message('Đã lưu tiến trình lên tài khoản.',true)}
  catch(e){message('Lưu trực tuyến chưa thành công: '+(e.message||'hãy thử lại'))}
 }
-window.DTWCloud={save(payload){lastPayload=payload;if(!currentUser)return;clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,900)},sync:syncFromCloud,getUser:()=>currentUser};
+window.DTWCloud={save(payload){const userId=currentUser?.id;if(!userId||(!readyUserId&&!syncingUserId))return;lastPayload=payload;if(readyUserId!==userId)return;clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,900)},sync:syncFromCloud,getUser:()=>currentUser};
 window.addEventListener('dtw-cloud-save',e=>window.DTWCloud.save(e.detail));
 registerBtn.addEventListener('click',async()=>{const email=emailInput.value.trim(),password=passwordInput.value;if(!email||!password){message('Nhập email và mật khẩu trước nhé.');return}if(password.length<6){message('Mật khẩu cần ít nhất 6 ký tự.');return}registerBtn.disabled=true;message('Đang tạo tài khoản...');try{const {data,error}=await client.auth.signUp({email,password});if(error)throw error;if(data.session){showSession(data.session);message('Đăng ký thành công và đã đăng nhập.',true)}else{message('Đã gửi yêu cầu đăng ký. Hãy kiểm tra email để xác nhận tài khoản.',true)}}catch(e){message('Đăng ký thất bại: '+(e.message||'lỗi không xác định'))}finally{registerBtn.disabled=false}});
 loginBtn.addEventListener('click',async()=>{const email=emailInput.value.trim(),password=passwordInput.value;if(!email||!password){message('Nhập email và mật khẩu trước nhé.');return}loginBtn.disabled=true;message('Đang đăng nhập...');try{const {data,error}=await client.auth.signInWithPassword({email,password});if(error)throw error;showSession(data.session);message('Đăng nhập thành công.',true)}catch(e){message('Đăng nhập thất bại: '+(e.message||'lỗi không xác định'))}finally{loginBtn.disabled=false}});
 logoutBtn.addEventListener('click',async()=>{logoutBtn.disabled=true;try{const {error}=await client.auth.signOut();if(error)throw error;showSession(null);message('Đã đăng xuất.',true)}catch(e){message('Đăng xuất thất bại: '+(e.message||'lỗi không xác định'))}finally{logoutBtn.disabled=false}});
-client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){currentUser=null;syncedUserId=null;clearTimeout(saveTimer);window.dispatchEvent(new CustomEvent('dtw-cloud-reset-player'))}showSession(session)});
+client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){currentUser=null;syncedUserId=null;readyUserId=null;lastPayload=null;clearTimeout(saveTimer);window.dispatchEvent(new CustomEvent('dtw-cloud-reset-player'))}showSession(session)});
 client.auth.getSession().then(({data})=>showSession(data.session));
 })();
