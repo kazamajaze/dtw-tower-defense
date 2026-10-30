@@ -96,7 +96,33 @@ $$('[data-edit-char]').forEach(el=>el.onclick=()=>{editIndex=el.dataset.editChar
 $$('[data-delete-char]').forEach(el=>el.onclick=e=>{e.stopPropagation();if(data.characters.length<=1)return toast('Cần giữ ít nhất một nhân vật.','error');const x=data.characters.find(c=>c.id===el.dataset.deleteChar);if(confirm('Xóa nhân vật '+x.name+'?')){data.characters=data.characters.filter(c=>c.id!==x.id);data.collection=data.collection.filter(id=>id!==x.id);if(editIndex===x.id)editIndex=null;if(selectedChar===x.id)selectedChar=null;save();render()}});
 $('#newChar')?.addEventListener('click',()=>{editIndex=null;render();const form=$('#charForm');if(form){form.reset();form.elements.namedItem('id').value='';form.elements.namedItem('name').focus();}const heading=$('#view h2');});
 const syncElementFields=()=>{const form=$('#charForm');if(!form)return;const chosen=[...form.querySelectorAll('input[name="elements"]:checked')].map(x=>x.value);form.querySelectorAll('[data-element-section]').forEach(el=>{el.style.display=chosen.includes(el.dataset.elementSection)?'block':'none'});};$$('input[name="elements"]').forEach(el=>el.addEventListener('change',syncElementFields));syncElementFields();
-$('#charForm')?.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.target),f=Object.fromEntries(fd);const old=data.characters.find(c=>c.id===f.id);const selectedElements=fd.getAll('elements');if(!selectedElements.length){toast('Chọn ít nhất một nguyên tố.','error');return}const elementParams={burnDps:+f.burnDps,burnDuration:+f.burnDuration,slowPercent:+f.slowPercent,slowDuration:+f.slowDuration,stunDuration:+f.stunDuration,chainCount:+f.chainCount,chainPercent:+f.chainPercent,chainRange:+f.chainRange,pushDistance:+f.pushDistance,woodHeal:+f.woodHeal,woodInterval:+f.woodInterval,metalBuff:+f.metalBuff,metalRange:+f.metalRange,earthGold:+f.earthGold,earthInterval:+f.earthInterval};const imageFile=fd.get('characterImage');let imageData=old?.image||'';if(imageFile&&imageFile.size){if(imageFile.size>2*1024*1024){toast('Ảnh nhân vật tối đa 2 MB.','error');return}imageData=await awaitFileData(imageFile).catch(()=>null);if(!imageData){toast('Không đọc được ảnh nhân vật.','error');return}}const c={...f,elements:selectedElements,element:selectedElements[0],acquisition:f.acquisition||'chest',shardPrice:Math.max(0,+f.shardPrice||0),image:imageData,chestEnabled:(f.acquisition||'chest')==='chest',id:f.id||id('c'),cost:+f.cost,damage:+f.damage,aoePercent:Math.max(0,+f.aoePercent||0),aoeRadius:Math.max(0,+f.aoeRadius||0),range:+f.range,rate:+f.rate,projectile:+f.projectile,cooldown:+f.cooldown,elementParams,levels:[{damage:Math.max(0,+f.lv1Damage||0),cost:0},{damage:Math.max(0,+f.lv2Damage||0),cost:Math.max(0,+f.lv2Cost||0)},{damage:Math.max(0,+f.lv3Damage||0),cost:Math.max(0,+f.lv3Cost||0)}]};if(old)data.characters=data.characters.map(x=>x.id===old.id?c:x);else data.characters.push(c);if(c.acquisition==='starter'&&!data.collection.includes(c.id))data.collection.push(c.id);editIndex=c.id;selectedChar=c.id;save();toast('Đã lưu nhân vật và hiệu ứng.','success');render()});
+$('#charForm')?.addEventListener('submit',async e=>{
+e.preventDefault();
+const form=e.currentTarget,submit=form.querySelector('button[type="submit"]');
+if(submit?.disabled)return;
+if(submit)submit.disabled=true;
+try{
+const fd=new FormData(form),f=Object.fromEntries(fd),old=data.characters.find(c=>c.id===f.id);
+delete f.characterImage;
+const selectedElements=fd.getAll('elements');
+if(!selectedElements.length){toast('Chọn ít nhất một nguyên tố.','error');return}
+const imageFile=fd.get('characterImage');let imageData=old?.image||'';
+if(imageFile&&imageFile.size){
+if(!/^image\/(png|jpeg|webp)$/.test(imageFile.type)){toast('Ảnh phải là PNG/JPG/WebP.','error');return}
+if(imageFile.size>2*1024*1024){toast('Ảnh nhân vật tối đa 2 MB.','error');return}
+imageData=await awaitFileData(imageFile).catch(()=>null);
+if(!imageData){toast('Không đọc được ảnh nhân vật.','error');return}
+}
+const elementParams={burnDps:+f.burnDps,burnDuration:+f.burnDuration,slowPercent:+f.slowPercent,slowDuration:+f.slowDuration,stunDuration:+f.stunDuration,chainCount:+f.chainCount,chainPercent:+f.chainPercent,chainRange:+f.chainRange,pushDistance:+f.pushDistance,woodHeal:+f.woodHeal,woodInterval:+f.woodInterval,metalBuff:+f.metalBuff,metalRange:+f.metalRange,earthGold:+f.earthGold,earthInterval:+f.earthInterval};
+const c={...f,elements:selectedElements,element:selectedElements[0],acquisition:f.acquisition||'chest',shardPrice:Math.max(0,+f.shardPrice||0),image:imageData,chestEnabled:(f.acquisition||'chest')==='chest',id:f.id||id('c'),cost:+f.cost,damage:+f.damage,aoePercent:Math.max(0,+f.aoePercent||0),aoeRadius:Math.max(0,+f.aoeRadius||0),range:+f.range,rate:+f.rate,projectile:+f.projectile,cooldown:+f.cooldown,elementParams,levels:[{damage:Math.max(0,+f.lv1Damage||0),cost:0},{damage:Math.max(0,+f.lv2Damage||0),cost:Math.max(0,+f.lv2Cost||0)},{damage:Math.max(0,+f.lv3Damage||0),cost:Math.max(0,+f.lv3Cost||0)}]};
+const previousCharacters=clone(data.characters),previousCollection=clone(data.collection),previousEdit=editIndex,previousSelected=selectedChar;
+if(old)data.characters=data.characters.map(x=>x.id===old.id?c:x);else data.characters.push(c);
+if(c.acquisition==='starter'&&!data.collection.includes(c.id))data.collection.push(c.id);
+if(!save()){data.characters=previousCharacters;data.collection=previousCollection;editIndex=previousEdit;selectedChar=previousSelected;return}
+editIndex=c.id;selectedChar=c.id;toast('Đã lưu nhân vật và hiệu ứng.','success');render();
+}catch(err){console.error(err);toast('Lưu nhân vật thất bại. Hãy thử lại hoặc kiểm tra ảnh đã chọn.','error')}
+finally{if(submit&&submit.isConnected)submit.disabled=false}
+});
 $$('[data-edit-monster]').forEach(el=>el.onclick=()=>{editIndex=el.dataset.editMonster;render()});
 $$('[data-delete-monster]').forEach(el=>el.onclick=e=>{e.stopPropagation();if(data.monsters.length<=1)return toast('Cần giữ ít nhất một loại quái.','error');const x=data.monsters.find(m=>m.id===el.dataset.deleteMonster);if(confirm('Xóa '+x.name+'?')){data.monsters=data.monsters.filter(m=>m.id!==x.id);data.campaign.forEach(s=>s.waves.forEach(w=>{if(w.monsterId===x.id)w.monsterId=data.monsters[0].id}));editIndex=null;save();render()}});
 $('#newMonster')?.addEventListener('click',()=>{editIndex=null;render()});
