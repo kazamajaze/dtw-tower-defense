@@ -54,7 +54,7 @@ function loadData(){try{const x=JSON.parse(localStorage.getItem('dtwtd_data'));i
 function makeWaves(monsters){return Array.from({length:12},(_,i)=>({count:7+i*2,interval:0.8,break:3,health:1+i*.13,speed:1+i*.025,boss:i===11,monsterId:i===11?'m4':(i%4===2?'m3':i%3===1?'m2':'m1'),rules:{hp:1,elementBonus:'',elementResist:'',attackRate:1,limit:0}}))}
 function ensure(){if(!data.campaign[0].waves||data.campaign[0].waves.length!==12)data.campaign[0].waves=makeWaves(data.monsters);for(const s of data.campaign){if(!s.waves||s.waves.length!==12)s.waves=makeWaves(data.monsters)}}
 ensure();
-function save(){try{localStorage.setItem('dtwtd_data',JSON.stringify(data));return true}catch(e){toast('Không thể lưu: dữ liệu có thể quá lớn. Hãy giảm kích thước ảnh bản đồ hoặc Export Project.','error');return false}}
+function save(){try{localStorage.setItem('dtwtd_data',JSON.stringify(data));window.dispatchEvent(new CustomEvent('dtw-cloud-save',{detail:clone(data)}));return true}catch(e){toast('Không thể lưu: dữ liệu có thể quá lớn. Hãy giảm kích thước ảnh bản đồ hoặc Export Project.','error');return false}}
 function toast(msg,type=''){const el=$('#toast');el.textContent=msg;el.className='toast'+(type?' '+type:'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.add('hidden'),3500)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(n){return Math.round(n).toLocaleString('vi-VN')}
