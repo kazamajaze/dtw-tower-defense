@@ -79,7 +79,6 @@ begin
  update public.redeem_codes set uses=uses+1 where code=c.code;
  return c.reward_shards;
 exception when unique_violation then raise exception 'You already redeemed this code'; end $$;
-revoke all on function public.send_broadcast_mail(text,text) from public,anon;
 revoke all on function public.send_broadcast_mail(text,text,text) from public,anon;
 grant execute on function public.send_broadcast_mail(text,text,text) to authenticated;
 
@@ -96,6 +95,5 @@ exception when unique_violation then raise exception 'You already claimed this c
 revoke all on function public.claim_inbox_character(uuid) from public,anon;
 grant execute on function public.claim_inbox_character(uuid) to authenticated;
 revoke all on function public.redeem_game_code(text) from public,anon;
-grant execute on function public.send_broadcast_mail(text,text) to authenticated;
 grant execute on function public.redeem_game_code(text) to authenticated;
 commit;
