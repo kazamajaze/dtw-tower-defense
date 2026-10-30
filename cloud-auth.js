@@ -10,9 +10,12 @@ const logoutBtn=document.querySelector('#auth-logout');
 if(!window.supabase||!status||!emailInput||!passwordInput||!registerBtn||!loginBtn||!logoutBtn)return;
 const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MIGRATION_KEY='dtwtd_cloud_migrated_v1';
-let currentUser=null,saveTimer=null,lastPayload=null,syncingUserId=null,syncedUserId=null,readyUserId=null;
+let currentUser=null,saveTimer=null,lastPayload=null,syncingUserId=null,syncedUserId=null,readyUserId=null,currentRole='player';
+function setRole(user){currentRole=user?.app_metadata?.role==='admin'?'admin':'player';window.dispatchEvent(new CustomEvent('dtw-role-change',{detail:{role:currentRole,email:user?.email||''}}));}
+async function loadSharedContent(){if(!currentUser)return;try{const {data,error}=await client.from('game_content').select('content').eq('id','main').maybeSingle();if(error)throw error;if(data?.content)window.dispatchEvent(new CustomEvent('dtw-shared-content-load',{detail:data.content}));}catch(e){message('Không tải được nội dung chung: '+(e.message||'kiểm tra quyền truy cập'));}}
+async function publishSharedContent(content){if(currentRole!=='admin'||!currentUser)throw new Error('Chỉ Admin đã đăng nhập mới được phát hành.');const {error}=await client.from('game_content').upsert({id:'main',content,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;return true;}
 function message(text,ok=false){status.textContent=text;status.style.color=ok?'#67e8b0':'#ff9ab0'}
-function showSession(session){const signedIn=!!session,nextUser=session?.user||null;if(currentUser?.id!==nextUser?.id){clearTimeout(saveTimer);lastPayload=null;readyUserId=null;syncedUserId=null}currentUser=nextUser;logoutBtn.hidden=!signedIn;registerBtn.hidden=signedIn;loginBtn.hidden=signedIn;emailInput.hidden=signedIn;passwordInput.hidden=signedIn;message(signedIn?'Đã đăng nhập: '+(session.user.email||'tài khoản'):'Chưa đăng nhập',signedIn);if(signedIn)syncFromCloud()}
+function showSession(session){const signedIn=!!session,nextUser=session?.user||null;if(currentUser?.id!==nextUser?.id){clearTimeout(saveTimer);lastPayload=null;readyUserId=null;syncedUserId=null}currentUser=nextUser;setRole(nextUser);logoutBtn.hidden=!signedIn;registerBtn.hidden=signedIn;loginBtn.hidden=signedIn;emailInput.hidden=signedIn;passwordInput.hidden=signedIn;message(signedIn?'Đã đăng nhập: '+(session.user.email||'tài khoản'):'Chưa đăng nhập',signedIn);if(signedIn){syncFromCloud();loadSharedContent()}}
 async function syncFromCloud(){
  const user=currentUser;if(!user||syncingUserId===user.id||syncedUserId===user.id)return;
  syncingUserId=user.id;
@@ -51,7 +54,7 @@ async function flushSave(){
  try{await writeSave(payload,userId);message('Đã lưu tiến trình lên tài khoản.',true)}
  catch(e){message('Lưu trực tuyến chưa thành công: '+(e.message||'hãy thử lại'))}
 }
-window.DTWCloud={save(payload){const userId=currentUser?.id;if(!userId||(!readyUserId&&!syncingUserId))return;lastPayload=payload;if(readyUserId!==userId)return;clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,900)},sync:syncFromCloud,getUser:()=>currentUser};
+window.DTWCloud={getRole:()=>currentRole,publishSharedContent,save(payload){const userId=currentUser?.id;if(!userId||(!readyUserId&&!syncingUserId))return;lastPayload=payload;if(readyUserId!==userId)return;clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,900)},sync:syncFromCloud,getUser:()=>currentUser};
 window.addEventListener('dtw-cloud-save',e=>window.DTWCloud.save(e.detail));
 registerBtn.addEventListener('click',async()=>{const email=emailInput.value.trim(),password=passwordInput.value;if(!email||!password){message('Nhập email và mật khẩu trước nhé.');return}if(password.length<6){message('Mật khẩu cần ít nhất 6 ký tự.');return}registerBtn.disabled=true;message('Đang tạo tài khoản...');try{const {data,error}=await client.auth.signUp({email,password});if(error)throw error;if(data.session){showSession(data.session);message('Đăng ký thành công và đã đăng nhập.',true)}else{message('Đã gửi yêu cầu đăng ký. Hãy kiểm tra email để xác nhận tài khoản.',true)}}catch(e){message('Đăng ký thất bại: '+(e.message||'lỗi không xác định'))}finally{registerBtn.disabled=false}});
 loginBtn.addEventListener('click',async()=>{const email=emailInput.value.trim(),password=passwordInput.value;if(!email||!password){message('Nhập email và mật khẩu trước nhé.');return}loginBtn.disabled=true;message('Đang đăng nhập...');try{const {data,error}=await client.auth.signInWithPassword({email,password});if(error)throw error;showSession(data.session);message('Đăng nhập thành công.',true)}catch(e){message('Đăng nhập thất bại: '+(e.message||'lỗi không xác định'))}finally{loginBtn.disabled=false}});
