@@ -20,8 +20,10 @@ async function syncFromCloud(){
   if(data?.save_data&&typeof data.save_data==='object'){
    window.dispatchEvent(new CustomEvent('dtw-cloud-load',{detail:{data:data.save_data,updated_at:data.updated_at||null}}));
    message('Đã đồng bộ tiến trình từ tài khoản.',true);
-  }else if(lastPayload){
-   await writeSave(lastPayload);
+  }else{
+   window.dispatchEvent(new CustomEvent('dtw-cloud-request-local'));
+   await new Promise(resolve=>setTimeout(resolve,120));
+   if(lastPayload)await writeSave(lastPayload);
    message('Đã sao lưu tiến trình trên thiết bị lên tài khoản.',true);
   }
  }catch(e){message('Chưa đồng bộ được dữ liệu: '+(e.message||'hãy kiểm tra cột save_data và quyền RLS'))}
