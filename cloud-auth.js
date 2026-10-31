@@ -68,7 +68,7 @@ async function syncFromCloud(){
    try{localStorage.setItem(MIGRATION_KEY,user.id)}catch(e){}
    message(migratedFor?'Đã tạo dữ liệu riêng mới cho tài khoản này.':'Đã chuyển tiến trình trên thiết bị vào tài khoản đầu tiên.',true);
   }
-  syncedUserId=user.id;readyUserId=user.id;
+  syncedUserId=user.id;readyUserId=user.id;window.dispatchEvent(new CustomEvent('dtw-cloud-synced'));
  }catch(e){message('Chưa đồng bộ được dữ liệu: '+(e.message||'hãy kiểm tra quyền lưu'))}
  finally{if(syncingUserId===user.id)syncingUserId=null}
 }
