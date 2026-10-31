@@ -53,7 +53,7 @@ Không có quyền truy cập trực tiếp Supabase Dashboard trong lần sửa
 1. Nếu chưa có cột/index: chạy `supabase-player-saves.sql`.
 2. Nếu chưa có `game_content` hoặc chưa gán Admin: kiểm tra rồi chạy `supabase_admin_player_setup.sql`.
 3. Nếu dùng Inbox/redeem: chạy `supabase_inbox_redeem_setup.sql`.
-4. Cuối cùng rà soát rồi chạy `supabase_security_hardening.sql` để thay policy cũ bằng policy owner/admin. Script này thay đổi quyền RLS, không xóa dữ liệu bảng. Tuy nhiên SQL hiện vẫn tạo DELETE policy cho Admin trên game_content và chủ tài khoản trên player_saves; client game không gọi DELETE. Nếu muốn cấm xóa tuyệt đối qua API, cần bỏ các policy/grant DELETE trước khi chạy.
+4. Cuối cùng rà soát rồi chạy `supabase_security_hardening.sql` để thay policy cũ bằng policy owner/admin. Script này chỉ thay đổi quyền RLS, không xóa dữ liệu bảng. `supabase_admin_player_setup.sql` có policy DELETE tạm cho Admin trên game_content, nhưng `supabase_security_hardening.sql` phải chạy cuối và sẽ loại policy đó; bản hardening không cấp DELETE cho game_content/player_saves (chỉ redeem_codes còn quyền quản trị DELETE).
 5. Sau khi gán role Admin, đăng xuất/đăng nhập lại để JWT nhận `app_metadata.role='admin'`.
 6. Kiểm thử bằng hai tài khoản: tài khoản A có dữ liệu; tài khoản B không được thấy shards/collection/đội hình của A.
 
