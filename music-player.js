@@ -29,7 +29,7 @@ const css=`
  radial-gradient(circle,#0000 0 31%,#ffffff22 31.5%,#0000 33%,#0000 97%,#ffffff55 98%,#0000 100%);mix-blend-mode:screen}
 .cd-ring{position:absolute;inset:0;border-radius:50%;pointer-events:none;box-shadow:inset 0 0 0 1.5px #ffffff30,inset 0 0 0 4px #0000004d}
 .cd-hole{position:absolute;left:50%;top:50%;width:38%;height:38%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#0c0f12 0 30%,#d9dfe2 31% 38%,#a9b2b6 39% 100%);box-shadow:0 0 0 1px #0006,inset 0 1px 2px #fff6}
-.cd-hub{position:absolute;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);border-radius:50%;border:1px solid #f6dc9a;padding:0;display:grid;place-items:center;
+.cd-hub{position:absolute;left:50%;top:50%;width:34px;height:34px;translate:-50% -50%;transform:none!important;border-radius:50%;border:1px solid #f6dc9a;padding:0;display:grid;place-items:center;
  background:linear-gradient(180deg,var(--gold2,#f2d488),var(--gold,#d8a94e));color:var(--goldink,#2a1d07);cursor:pointer;box-shadow:0 2px 8px #0008,0 1px 0 #fff6 inset;z-index:2}
 .cd-hub:hover{filter:brightness(1.08);background:linear-gradient(180deg,#f8dea0,#e2b65d)}
 .cd-hub svg{width:17px;height:17px}
