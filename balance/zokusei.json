@@ -1,0 +1,554 @@
+{
+ "ctfu9s8b": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 17,
+    "rate": 1,
+    "range": 125,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "burnDps": 5,
+     "burnDuration": 3
+    },
+    "elements": [
+     "Hỏa"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 24,
+    "rate": 1.05,
+    "range": 130,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "burnDps": 8,
+     "burnDuration": 3
+    },
+    "elements": [
+     "Hỏa"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 32,
+    "rate": 1.1,
+    "range": 135,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "burnDps": 12,
+     "burnDuration": 3.5
+    },
+    "elements": [
+     "Hỏa"
+    ]
+   }
+  ],
+  "damage": 17,
+  "rate": 1,
+  "range": 125,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "burnDps": 5,
+   "burnDuration": 3
+  }
+ },
+ "cia3ttue": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 15,
+    "rate": 1.1,
+    "range": 140,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "slowPercent": 25,
+     "slowDuration": 2
+    },
+    "elements": [
+     "Thủy"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 21,
+    "rate": 1.15,
+    "range": 145,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "slowPercent": 30,
+     "slowDuration": 2
+    },
+    "elements": [
+     "Thủy"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 28,
+    "rate": 1.2,
+    "range": 150,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "slowPercent": 35,
+     "slowDuration": 2.5
+    },
+    "elements": [
+     "Thủy"
+    ]
+   }
+  ],
+  "damage": 15,
+  "rate": 1.1,
+  "range": 140,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "slowPercent": 25,
+   "slowDuration": 2
+  }
+ },
+ "crlq0bxr": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 17,
+    "rate": 1,
+    "range": 130,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "woodHeal": 0.2,
+     "woodInterval": 15,
+     "woodBlock": 2,
+     "woodLeech": 8
+    },
+    "elements": [
+     "Mộc"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 24,
+    "rate": 1.05,
+    "range": 135,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "woodHeal": 0.3,
+     "woodInterval": 14,
+     "woodBlock": 2.5,
+     "woodLeech": 10
+    },
+    "elements": [
+     "Mộc"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 32,
+    "rate": 1.1,
+    "range": 140,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "woodHeal": 0.4,
+     "woodInterval": 12,
+     "woodBlock": 3,
+     "woodLeech": 12
+    },
+    "elements": [
+     "Mộc"
+    ]
+   }
+  ],
+  "damage": 17,
+  "rate": 1,
+  "range": 130,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "woodHeal": 0.2,
+   "woodInterval": 15,
+   "woodBlock": 2,
+   "woodLeech": 8
+  }
+ },
+ "ch6wg7md": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 22,
+    "rate": 0.85,
+    "range": 125,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "earthGold": 8,
+     "earthInterval": 10,
+     "earthShred": 2,
+     "earthShredDur": 3
+    },
+    "elements": [
+     "Thổ"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 31,
+    "rate": 0.9,
+    "range": 130,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "earthGold": 12,
+     "earthInterval": 10,
+     "earthShred": 3,
+     "earthShredDur": 3
+    },
+    "elements": [
+     "Thổ"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 42,
+    "rate": 0.95,
+    "range": 135,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "earthGold": 16,
+     "earthInterval": 10,
+     "earthShred": 4,
+     "earthShredDur": 3.5
+    },
+    "elements": [
+     "Thổ"
+    ]
+   }
+  ],
+  "damage": 22,
+  "rate": 0.85,
+  "range": 125,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "earthGold": 8,
+   "earthInterval": 10,
+   "earthShred": 2,
+   "earthShredDur": 3
+  }
+ },
+ "cv0fl1vl": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 15,
+    "rate": 1.1,
+    "range": 135,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "chainCount": 2,
+     "chainRange": 70,
+     "chainPercent": 35
+    },
+    "elements": [
+     "Lôi"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 21,
+    "rate": 1.15,
+    "range": 140,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "chainCount": 2,
+     "chainRange": 80,
+     "chainPercent": 40
+    },
+    "elements": [
+     "Lôi"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 28,
+    "rate": 1.2,
+    "range": 145,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "chainCount": 3,
+     "chainRange": 85,
+     "chainPercent": 45
+    },
+    "elements": [
+     "Lôi"
+    ]
+   }
+  ],
+  "damage": 15,
+  "rate": 1.1,
+  "range": 135,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "chainCount": 2,
+   "chainRange": 70,
+   "chainPercent": 35
+  }
+ },
+ "c3bbyvnx": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 18,
+    "rate": 0.9,
+    "range": 130,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "stunDuration": 0.35
+    },
+    "elements": [
+     "Băng"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 25,
+    "rate": 0.95,
+    "range": 135,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "stunDuration": 0.4
+    },
+    "elements": [
+     "Băng"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 34,
+    "rate": 1,
+    "range": 140,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "stunDuration": 0.45
+    },
+    "elements": [
+     "Băng"
+    ]
+   }
+  ],
+  "damage": 18,
+  "rate": 0.9,
+  "range": 130,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "stunDuration": 0.35
+  }
+ },
+ "ciumisat": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 19,
+    "rate": 1,
+    "range": 135,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "metalBuff": 10,
+     "metalRange": 90,
+     "metalCrit": 12,
+     "metalCritMul": 1.8,
+     "metalPierce": 2
+    },
+    "elements": [
+     "Kim"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 26,
+    "rate": 1.05,
+    "range": 140,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "metalBuff": 12,
+     "metalRange": 95,
+     "metalCrit": 14,
+     "metalCritMul": 1.9,
+     "metalPierce": 3
+    },
+    "elements": [
+     "Kim"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 35,
+    "rate": 1.1,
+    "range": 145,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "metalBuff": 15,
+     "metalRange": 100,
+     "metalCrit": 16,
+     "metalCritMul": 2,
+     "metalPierce": 4
+    },
+    "elements": [
+     "Kim"
+    ]
+   }
+  ],
+  "damage": 19,
+  "rate": 1,
+  "range": 135,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "metalBuff": 10,
+   "metalRange": 90,
+   "metalCrit": 12,
+   "metalCritMul": 1.8,
+   "metalPierce": 2
+  }
+ },
+ "c7ghmh8h": {
+  "levels": [
+   {
+    "cost": 0,
+    "damage": 14,
+    "rate": 1.2,
+    "range": 150,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "pushDistance": 15
+    },
+    "elements": [
+     "Phong"
+    ]
+   },
+   {
+    "cost": 260,
+    "damage": 19,
+    "rate": 1.25,
+    "range": 155,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "pushDistance": 18
+    },
+    "elements": [
+     "Phong"
+    ]
+   },
+   {
+    "cost": 650,
+    "damage": 26,
+    "rate": 1.3,
+    "range": 160,
+    "type": "single",
+    "aoePercent": 0,
+    "aoeRadius": 50,
+    "projectile": 280,
+    "elementParams": {
+     "pushDistance": 22
+    },
+    "elements": [
+     "Phong"
+    ]
+   }
+  ],
+  "damage": 14,
+  "rate": 1.2,
+  "range": 150,
+  "type": "single",
+  "aoePercent": 0,
+  "aoeRadius": 50,
+  "projectile": 280,
+  "elementParams": {
+   "pushDistance": 15
+  }
+ }
+}

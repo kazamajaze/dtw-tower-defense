@@ -18,9 +18,9 @@ async ([stage, units, placement]) => {
   __sb();const b=__b();b.paused=true;
   units.forEach((cid,i)=>b.units.push({id:'u'+i,charId:cid,x:spots[i].x,y:spots[i].y,level:0,cool:0,angle:0}));b.usedCharIds=[...units];
   let t=0;const log=[];let lastWave=-1,livesAtWave=b.lives;
-  while(!b.ended&&t<1500){__ub(0.05);t+=0.05;if(b.wave!==lastWave){if(lastWave>=0)log.push({w:lastWave+1,lost:livesAtWave-b.lives});lastWave=b.wave;livesAtWave=b.lives}}
+  /*AUTOUP*/while(!b.ended&&t<1500){for(const u of b.units){const c=d.characters.find(x=>x.id===u.charId);const nx=c.levels?.[u.level+1];if(nx&&b.gold>=nx.cost){b.gold-=nx.cost;u.level++}}__ub(0.05);t+=0.05;if(b.wave!==lastWave){if(lastWave>=0)log.push({w:lastWave+1,lost:livesAtWave-b.lives});lastWave=b.wave;livesAtWave=b.lives}}
   log.push({w:lastWave+1,lost:livesAtWave-b.lives});
-  return {won:b.won,lives:b.lives,start:stage.lives,t:Math.round(t),wave:b.wave+1,spots:spots.map(s=>s.c),log};
+  return {lv:b.units.map(u=>u.level+1),won:b.won,lives:b.lives,start:stage.lives,t:Math.round(t),wave:b.wave+1,spots:spots.map(s=>s.c),log};
 }
 """
 async def run(stage, scenarios):
@@ -45,4 +45,4 @@ if __name__=='__main__':
     res=asyncio.run(run(stage,sc))
     for r in res:
         lost=[x['lost'] for x in r['log']]
-        print(f"{r['name']:<22} {'WIN ' if r['won'] else 'LOSE'} lives {r['lives']}/{r['start']} wave {r['wave']} t={r['t']}s cov={r['spots']} lostPerWave={lost} {r['errs']}")
+        print(f"{r['name']:<22} lv{r['lv']} {'WIN ' if r['won'] else 'LOSE'} lives {r['lives']}/{r['start']} wave {r['wave']} t={r['t']}s cov={r['spots']} lostPerWave={lost} {r['errs']}")
