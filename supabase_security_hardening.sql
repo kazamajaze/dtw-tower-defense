@@ -67,6 +67,7 @@ grant select on public.game_content to authenticated;
 grant insert,update,select on public.game_content to authenticated;
 grant select,insert,update,delete on public.redeem_codes to authenticated;
 grant select,insert,update on public.player_saves to authenticated;
+revoke delete on public.game_content,public.player_saves from authenticated;
 revoke all on public.game_content,public.redeem_codes,public.player_saves from anon;
 
 -- Keep RPC execution explicit; their bodies must validate auth.uid(), role,
