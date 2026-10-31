@@ -267,8 +267,8 @@ button:disabled{opacity:.42;cursor:not-allowed;transform:none}
 
 <section id="view"></section></main></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;const s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';s.onerror=()=>console.error('Không tải được Supabase SDK từ CDN dự phòng.');document.head.appendChild(s);"></script>
-<script src="./cloud-auth.js?v=20261031v" defer></script>
-<script src="./music-player.js?v=20261031v" defer></script>
+<script src="./cloud-auth.js?v=20261031w" defer></script>
+<script src="./music-player.js?v=20261031w" defer></script>
 <script>
 (()=>{'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -415,7 +415,7 @@ const previousCharacters=clone(data.characters),previousCollection=clone(data.co
 if(old)data.characters=data.characters.map(x=>x.id===old.id?c:x);else data.characters.push(c);
 if(c.acquisition==='starter'&&!data.collection.includes(c.id))data.collection.push(c.id);
 if(!save()){data.characters=previousCharacters;data.collection=previousCollection;editIndex=previousEdit;selectedChar=previousSelected;return}
-editIndex=c.id;selectedChar=c.id;toast('Đã lưu nhân vật thành công.','success');render();
+editIndex=c.id;selectedChar=c.id;toast('Đã lưu "'+c.name+'" · tầm đánh theo cấp: '+levels.map(l=>l.range).join(' / ')+'. Bấm 📢 Phát hành để người chơi thấy.','success');render();
 }catch(err){console.error(err);toast('Lưu nhân vật thất bại. Hãy thử lại hoặc kiểm tra ảnh đã chọn.','error')}
 finally{if(submit&&submit.isConnected)submit.disabled=false}
 });
