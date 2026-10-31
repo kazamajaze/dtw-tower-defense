@@ -41,9 +41,6 @@ with check (
   (auth.jwt()->'app_metadata'->>'role')='admin'
   and updated_by=auth.uid()
 );
-create policy game_content_delete_admin
-on public.game_content for delete to authenticated
-using ((auth.jwt()->'app_metadata'->>'role')='admin');
 
 -- Redeem-code rows are managed only by admins. Players redeem via RPC.
 create policy redeem_codes_admin_all
@@ -65,14 +62,11 @@ create policy player_saves_update_own
 on public.player_saves for update to authenticated
 using (user_id=auth.uid())
 with check (user_id=auth.uid());
-create policy player_saves_delete_own
-on public.player_saves for delete to authenticated
-using (user_id=auth.uid());
 
 grant select on public.game_content to authenticated;
-grant insert,update,delete,select on public.game_content to authenticated;
+grant insert,update,select on public.game_content to authenticated;
 grant select,insert,update,delete on public.redeem_codes to authenticated;
-grant select,insert,update,delete on public.player_saves to authenticated;
+grant select,insert,update on public.player_saves to authenticated;
 revoke all on public.game_content,public.redeem_codes,public.player_saves from anon;
 
 -- Keep RPC execution explicit; their bodies must validate auth.uid(), role,
