@@ -1,68 +1,74 @@
 # HANDOFF — Dominate The World: Tower Defense
 
-## Mục đích
-Tài liệu này dành cho Claude Free để đọc mã nguồn game và hỗ trợ nhúng/liên kết game vào trang Novel.
-
-## Mã nguồn hiện tại
+## Nguồn hiện tại
 - Repository: https://github.com/kazamajaze/dtw-tower-defense
-- Game đang chạy: https://kazamajaze.github.io/dtw-tower-defense/
-- File chính: `index.html`
-- Đăng nhập/đồng bộ tiến trình: `cloud-auth.js`
-- Nhánh: `main`
+- Game Pages: https://kazamajaze.github.io/dtw-tower-defense/
+- Game: `index.html`
+- Auth + Supabase: `cloud-auth.js`
+- SQL: `supabase-player-saves.sql`, `supabase_admin_player_setup.sql`, `supabase_inbox_redeem_setup.sql`, `supabase_security_hardening.sql`
 
-Tải toàn bộ mã nguồn: mở repository → nút **Code** → **Download ZIP**. Giải nén rồi tải ZIP hoặc hai file trên vào Claude để Claude đọc.
+## Ranh giới dữ liệu — bắt buộc giữ
+### Nội dung game dùng chung
+Chỉ lưu trong `public.game_content`, row `id='main'`:
+- `characters`, `monsters`, `maps`, `campaign`, `rouletteRewards`
+- Chỉ Admin đã xác thực được publish. `cloud-auth.js` chỉ pick các khóa trên, không chuyển payload người chơi vào `game_content`.
 
-## Kiến trúc đang có
-- Game là ứng dụng HTML/CSS/JS một trang.
-- Dữ liệu thiết kế game nằm trong `data` của `index.html`: characters, monsters, maps, campaign, settings và dữ liệu tiến trình.
-- Dữ liệu cục bộ dùng localStorage key `dtwtd_data`.
-- Tài khoản và tiến trình cloud dùng Supabase Auth + bảng `player_saves`, truy vấn theo `user_id`.
-- `playerSaveData()` chỉ đóng gói trạng thái người chơi: collection, equipped, wins, shards, chestsClaimed, completed, settings.
-- Không đưa Supabase service-role key vào frontend. Publishable key hiện có trong `cloud-auth.js` là khóa client-side.
+### Dữ liệu riêng của từng tài khoản
+Chỉ lưu trong `public.player_saves`, khóa `user_id`, JSONB `save_data`:
+- `collection`, `equipped`, `shards`, `wins`, `chestsClaimed`, `completed`, `settings`, `inventory`
+- Payload hiện dùng `schemaVersion: 2`, `playerState`.
+- `inventory` đã có trong payload để lưu vật phẩm; giao diện vật phẩm riêng chưa được xây dựng trong bản game hiện tại.
+- RLS phải giới hạn SELECT/INSERT/UPDATE theo `auth.uid() = user_id`. Không ghi dữ liệu người chơi vào `game_content`.
 
-## Sự kiện tích hợp hiện có
-Game phát các sự kiện:
-- `dtw-cloud-save`: gửi payload tiến trình người chơi.
-- `dtw-cloud-load`: nhận dữ liệu tiến trình người chơi.
-- `dtw-cloud-request-local`: yêu cầu game gửi tiến trình local.
-- `dtw-cloud-reset-player`: reset phần tiến trình người chơi trên thiết bị.
+## LocalStorage và migration an toàn
+- Legacy key `dtwtd_data` được đọc để khôi phục dữ liệu cũ, nhưng code mới không ghi đè hoặc xóa key này.
+- Nội dung chung mới: `dtwtd_shared_content_v1`.
+- Tiến trình local theo tài khoản: `dtwtd_player_state_v1:<user_id>`; khách chưa đăng nhập dùng hậu tố `guest`.
+- `dtwtd_cloud_migrated_v1` đánh dấu tài khoản đầu tiên đã nhận dữ liệu legacy trên thiết bị. Tài khoản khác không có save riêng sẽ bắt đầu từ mặc định, không nhận nhầm tiến trình của tài khoản đầu.
+- Nếu tài khoản có bản local riêng thì ưu tiên bản đó khi cloud row chưa tồn tại.
+- Khi tải cloud save cũ thiếu một số trường mới, dữ liệu local của đúng tài khoản/legacy owner được giữ làm fallback; tài khoản khác không dùng fallback của người đầu.
+- Đăng xuất phải flush save trước. Nếu chưa xác nhận lưu cloud thành công, nút đăng xuất giữ phiên đăng nhập để tránh mất tiến trình.
+- Không xóa `dtwtd_data`, không chạy reset toàn bộ data trong migration.
 
-API trình duyệt:
-- `window.DTWCloud.save(payload)`
-- `window.DTWCloud.sync()`
-- `window.DTWCloud.getUser()`
+## Import / export / cập nhật nội dung
+- File backup mới có `format: "dtw-shared-content"`, chỉ chứa `characters`, `monsters`, `maps`, `campaign`, `rouletteRewards`.
+- Import chỉ dành cho Admin, xác thực cấu trúc trước khi áp dụng và chỉ thay đổi các khóa nội dung chung.
+- Import tương thích file JSON dự án cũ bằng cách chỉ lấy các khóa nội dung; bỏ qua `collection`, `equipped`, `shards`, `wins`, `inventory`, `completed`, `settings`.
+- Backup Novel ZIP/JSON không phải backup game và không được nhập vào game.
+- Export không bao giờ chứa email, user id, token hoặc tiến trình người chơi.
+- Nút khôi phục mẫu chỉ khôi phục nội dung chung, không reset tài khoản.
+- Khi nội dung chung xóa một nhân vật, ID sở hữu/đội hình của người chơi vẫn được giữ. Nếu nhân vật được phát hành lại, quyền sở hữu cũ vẫn còn.
 
-## Ranh giới dữ liệu bắt buộc khi tích hợp Novel
-1. **Dữ liệu dùng chung do admin/Novel quản lý**: nội dung nhân vật, quái, bản đồ, campaign, wave, thông số cân bằng và cấu hình mở khóa. Đây là nội dung game, không phải tài sản của từng người chơi.
-2. **Dữ liệu riêng theo tài khoản**: nhân vật đã sở hữu, đội hình, wins, shards, rương đã nhận, màn đã vượt, cài đặt. Dữ liệu này tiếp tục thuộc từng `user_id` trong `player_saves`.
-3. Không được ghi đè/xóa `player_saves` khi cập nhật nội dung dùng chung. Không reset tài nguyên hoặc tiến trình của người chơi khi admin cập nhật game.
-4. Không cho client tự ghi nội dung dùng chung bằng quyền admin. Quyền cập nhật phải được xác thực phía server/database.
+## Sự kiện và API
+- `dtw-cloud-save`: gửi player payload.
+- `dtw-cloud-load`: nhận player payload; detail gồm `userId` và cờ fallback.
+- `dtw-cloud-local-load`: nạp local save theo user trước khi hỏi cloud.
+- `dtw-cloud-request-local`: yêu cầu player payload hiện tại.
+- `dtw-cloud-reset-player`: reset player state trong bộ nhớ cho tài khoản mới/đăng xuất; không xóa legacy backup.
+- `dtw-shared-content-load`: nhận riêng nội dung chung.
+- `window.DTWCloud.getUser()`, `isReady()`, `save(payload)`, `sync()`, `publishSharedContent(content)`.
 
-## Cách nhúng khuyến nghị
-Ưu tiên nhúng game bằng iframe từ URL GitHub Pages để giảm xung đột CSS/JS với Novel:
-```html
-<iframe
-  src="https://kazamajaze.github.io/dtw-tower-defense/"
-  title="Dominate The World: Tower Defense"
-  style="width:100%;min-height:800px;border:0;border-radius:12px"
-  loading="lazy"
-  allow="fullscreen"
-></iframe>
-```
-Nếu cần trao đổi dữ liệu giữa Novel và game, dùng `window.postMessage` với kiểm tra chính xác `event.origin` ở cả hai phía. Không dùng `'*'` làm target origin khi gửi dữ liệu nhạy cảm. Chỉ gửi dữ liệu cần thiết; không gửi mật khẩu, access token hay service-role key.
+## Supabase — cần kiểm tra thủ công
+Không có quyền truy cập trực tiếp Supabase Dashboard trong lần sửa này; chưa xác minh schema/policy đang chạy trên project thật và chưa chạy SQL.
+1. Nếu chưa có cột/index: chạy `supabase-player-saves.sql`.
+2. Nếu chưa có `game_content` hoặc chưa gán Admin: kiểm tra rồi chạy `supabase_admin_player_setup.sql`.
+3. Nếu dùng Inbox/redeem: chạy `supabase_inbox_redeem_setup.sql`.
+4. Cuối cùng rà soát rồi chạy `supabase_security_hardening.sql` để thay policy cũ bằng policy owner/admin. Script này chỉ thay đổi quyền RLS, không xóa dữ liệu bảng. `supabase_admin_player_setup.sql` có policy DELETE tạm cho Admin trên game_content, nhưng `supabase_security_hardening.sql` phải chạy cuối và sẽ loại policy đó; bản hardening drop các DELETE policy và chạy `REVOKE DELETE` rõ ràng cho `game_content/player_saves` đối với authenticated (chỉ `redeem_codes` còn quyền quản trị DELETE).
+5. Sau khi gán role Admin, đăng xuất/đăng nhập lại để JWT nhận `app_metadata.role='admin'`.
+6. Kiểm thử bằng hai tài khoản: tài khoản A có dữ liệu; tài khoản B không được thấy shards/collection/đội hình của A.
 
-## Việc chưa hoàn tất — Claude cần biết rõ
-- Chưa có cầu nối `postMessage` được triển khai trong game.
-- Chưa có endpoint/bảng riêng cho nội dung game dùng chung do admin quản lý.
-- Chưa nối schema dữ liệu Novel với schema characters/monsters/maps/campaign trong game.
-- Chưa có phân quyền admin phía server cho việc xuất bản nội dung dùng chung.
-- Vì vậy hiện tại iframe chỉ hiển thị game độc lập; không được mô tả là đã đồng bộ nội dung Novel.
+Không đưa service-role key vào frontend. Publishable key trong `cloud-auth.js` là client key; RLS mới là ranh giới bảo mật.
 
-## Prompt gửi Claude Free
-"Đọc toàn bộ mã nguồn game trong các file đính kèm và tài liệu HANDOFF_FOR_CLAUDE.md. Hãy đề xuất cách tích hợp game vào file Novel `Dominate_The_World_Kazama_Jaze.html`. Mục tiêu: (1) nhúng game vào trang Novel, ưu tiên iframe; (2) thiết kế cầu nối postMessage an toàn nếu thật sự cần; (3) tách nội dung game dùng chung do admin quản lý khỏi tiến trình riêng từng tài khoản; (4) tuyệt đối không xóa/ghi đè player_saves, tài nguyên, nhân vật sở hữu hoặc tiến trình người chơi khi cập nhật nội dung chung. Trước tiên hãy phân tích và liệt kê các điểm cần sửa theo file/hàm; chưa tự ý xóa hoặc thay thế dữ liệu hiện có. Trả lời bằng patch cụ thể và giải thích cách áp dụng."
+## Novel — cấu trúc đã kiểm tra
+File `Dominate_The_World_Kazama_Jaze.html` có backup riêng:
+- `BACKUP_KEY = 'dtw_full_backup'`
+- `collectAllData()` gom chapters, characters, powerTree, season data, comments, elements, clans, map/lore/OST.
+- `applyAllData()` khôi phục các trường Novel.
+- ZIP export/import dùng `backup.json`.
+Không đưa game payload vào `collectAllData()` hoặc `applyAllData()`; không đổi key backup Novel. Nhúng game bằng iframe để hai ứng dụng có storage và vòng đời riêng. Hiện chưa triển khai postMessage bridge.
 
-## Kiểm tra trước khi triển khai
-- Xác nhận file Novel đích và vị trí muốn hiển thị game.
-- Xác nhận nguồn gốc được phép trong iframe/CSP.
-- Thiết kế schema nội dung chung và policy admin trước khi bật ghi dữ liệu.
-- Kiểm thử đăng nhập hai tài khoản khác nhau để chắc chắn tiến trình tách biệt.
+## Ghi chú phục hồi mã nguồn
+Bản `main` được kiểm tra có `index.html` chỉ 20,366 bytes và kết thúc giữa hàm `nav()`; file game đầy đủ trước đó có khoảng 102 KB. Nhánh sửa phục hồi toàn bộ file, giữ phần CSS/ensure/shards-wins mới nhất, và giữ các sửa selector đã kiểm tra. Không merge/deploy cho tới khi review PR và kiểm thử.
+
+## Nhúng game vào Novel
+Xem `NOVEL_INTEGRATION.md` để dùng iframe an toàn và giữ backup Novel tách biệt.
