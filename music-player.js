@@ -207,7 +207,7 @@ seek.addEventListener('change',()=>{if(audio.duration)audio.currentTime=seek.val
 
 coverIn.addEventListener('change',()=>{const f=coverIn.files[0];if(f&&/^image\//.test(f.type)){const u=URL.createObjectURL(f);previewImg.style.backgroundImage=`url("${u}")`;preview.hidden=false}else{preview.hidden=true}});
 fileIn.addEventListener('change',()=>{const f=fileIn.files[0];const title=$('#cd-title');if(f&&!title.value.trim())title.placeholder=f.name.replace(/\.[^.]+$/,'')});
-form.addEventListener('submit',async e=>{e.preventDefault();const api=window.DTWCloud?.music;if(!api){setMsg('Chưa kết nối được máy chủ.','err');return}
+form.addEventListener('submit',async e=>{e.preventDefault();const api=window.DTWCloud?.music;if(!api){setMsg(window.DTWCloud?'Trình duyệt đang dùng bản game cũ. Bấm Ctrl + F5 để tải lại rồi thử lại.':'Chưa kết nối được máy chủ. Kiểm tra mạng rồi tải lại trang.','err');return}
  const audioFile=fileIn.files[0];if(!audioFile){setMsg('Chọn file nhạc trước nhé.','err');return}
  uploadBtn.disabled=true;setMsg('Đang chuẩn bị…');
  try{await api.upload({audio:audioFile,cover:coverIn.files[0]||null,title:$('#cd-title').value,artist:$('#cd-artist').value},t=>setMsg(t));
