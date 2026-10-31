@@ -214,8 +214,8 @@ button:disabled{opacity:.42;cursor:not-allowed;transform:none}
 
 <section id="view"></section></main></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;const s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';s.onerror=()=>console.error('Không tải được Supabase SDK từ CDN dự phòng.');document.head.appendChild(s);"></script>
-<script src="./cloud-auth.js?v=20261031e" defer></script>
-<script src="./music-player.js?v=20261031e" defer></script>
+<script src="./cloud-auth.js?v=20261031f" defer></script>
+<script src="./music-player.js?v=20261031f" defer></script>
 <script>
 (()=>{'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -246,8 +246,12 @@ function ensure(){for(const k of ['characters','monsters','maps','campaign'])if(
 ensure();
 function applyRole(){const a=isAdmin();$$('.nav').forEach(b=>{if(ADMIN_TABS.includes(b.dataset.tab))b.classList.toggle('hidden',!a)});$('#authorSubnav').classList.toggle('hidden',true);$('#publishBtn').classList.toggle('hidden',!a);$('#importBtn').classList.toggle('hidden',!a);if(!a&&ADMIN_TABS.includes(tab))nav('Battle')}
 window.addEventListener('dtw-role-change',applyRole);setTimeout(applyRole,0);
-$('#publishBtn').addEventListener('click',async()=>{if(!isAdmin())return;if(!confirm('Phát hành nhân vật, quái, map, campaign hiện tại cho TẤT CẢ người chơi?'))return;try{await window.DTWCloud.publishSharedContent({characters:data.characters,monsters:data.monsters,maps:data.maps,campaign:data.campaign,rouletteRewards:data.rouletteRewards||{shards:[0,10,25,50],characters:true}});toast('Đã phát hành cho mọi người chơi.','success')}catch(e){toast('Phát hành thất bại: '+(e.message||'hãy thử lại'),'error')}});
-window.addEventListener('dtw-shared-content-load',e=>{const c=e.detail;if(isAdmin()||(battle&&battle.running))return;if(!c||!['characters','monsters','maps','campaign'].every(k=>Array.isArray(c[k])))return;data.characters=c.characters;data.monsters=c.monsters;data.maps=c.maps;data.campaign=c.campaign;if(c.rouletteRewards&&typeof c.rouletteRewards==='object')data.rouletteRewards={...c.rouletteRewards,shards:Array.isArray(c.rouletteRewards.shards)?c.rouletteRewards.shards:[0,10,25,50],shardWeights:c.rouletteRewards.shardWeights||{},characterIds:Array.isArray(c.rouletteRewards.characterIds)?c.rouletteRewards.characterIds:null,characterWeights:c.rouletteRewards.characterWeights||{}};ensure();const ok=id=>data.characters.some(x=>x.id===id);data.collection=(data.collection||[]).filter(ok);grantStarterCharacters();data.equipped=(data.equipped||[]).filter(ok);save();render()});
+$('#publishBtn').addEventListener('click',async()=>{if(!isAdmin())return;if(!confirm('Phát hành nhân vật, quái, map, campaign hiện tại cho TẤT CẢ người chơi?'))return;try{await window.DTWCloud.publishSharedContent({characters:withCloudImages(data.characters,'characters'),monsters:data.monsters,maps:withCloudImages(data.maps,'maps'),campaign:data.campaign,rouletteRewards:data.rouletteRewards||{shards:[0,10,25,50],characters:true}});toast('Đã phát hành cho mọi người chơi.','success')}catch(e){toast('Phát hành thất bại: '+(e.message||'hãy thử lại'),'error')}});
+const cloudImages={maps:{},characters:{}};
+function rememberCloudImages(c){for(const k of ['maps','characters'])for(const x of (Array.isArray(c?.[k])?c[k]:[]))if(x&&x.id&&typeof x.image==='string'&&x.image)cloudImages[k][x.id]=x.image}
+function restoreMissingImages(){let n=0;for(const k of ['maps','characters'])for(const x of data[k]||[])if(x&&!x.image&&cloudImages[k][x.id]){x.image=cloudImages[k][x.id];n++}return n}
+function withCloudImages(list,k){return (list||[]).map(x=>x&&!x.image&&cloudImages[k][x.id]?{...x,image:cloudImages[k][x.id]}:x)}
+window.addEventListener('dtw-shared-content-load',e=>{const c=e.detail;rememberCloudImages(c);if(isAdmin()){if(restoreMissingImages())render();return}if(battle&&battle.running)return;if(!c||!['characters','monsters','maps','campaign'].every(k=>Array.isArray(c[k])))return;data.characters=c.characters;data.monsters=c.monsters;data.maps=c.maps;data.campaign=c.campaign;if(c.rouletteRewards&&typeof c.rouletteRewards==='object')data.rouletteRewards={...c.rouletteRewards,shards:Array.isArray(c.rouletteRewards.shards)?c.rouletteRewards.shards:[0,10,25,50],shardWeights:c.rouletteRewards.shardWeights||{},characterIds:Array.isArray(c.rouletteRewards.characterIds)?c.rouletteRewards.characterIds:null,characterWeights:c.rouletteRewards.characterWeights||{}};ensure();const ok=id=>data.characters.some(x=>x.id===id);data.collection=(data.collection||[]).filter(ok);grantStarterCharacters();data.equipped=(data.equipped||[]).filter(ok);save();render()});
 window.addEventListener('dtw-cloud-request-local',()=>window.dispatchEvent(new CustomEvent('dtw-cloud-save',{detail:playerSaveData()})));
 window.addEventListener('dtw-cloud-reset-player',()=>{data.collection=clone(DEFAULTS.collection);data.equipped=clone(DEFAULTS.equipped);data.wins=DEFAULTS.wins;data.shards=DEFAULTS.shards;data.chestsClaimed=DEFAULTS.chestsClaimed;data.completed=clone(DEFAULTS.completed);data.settings=clone(DEFAULTS.settings);try{localStorage.setItem('dtwtd_data',JSON.stringify(data))}catch(e){}render()});
 function playerSaveData(){return {schemaVersion:1,playerState:{shards:Math.max(0,Number(data.shards)||0),wins:Math.max(0,Number(data.wins)||0),collection:clone(data.collection||[]),equipped:clone(data.equipped||[]),chestsClaimed:Number(data.chestsClaimed)||0,completed:clone(data.completed||[]),settings:{sound:!!data.settings?.sound,speed:Number(data.settings?.speed)||1}}}}
@@ -436,7 +440,7 @@ const hasShard=values.some(v=>Number(shardWeights[v]??1)>0),hasCharacter=charact
 if(!hasShard&&!hasCharacter)throw new Error('Chọn ít nhất một phần thưởng có trọng số lớn hơn 0.');
 data.rouletteRewards={shards:values,shardWeights,characterIds,characterWeights};
 if(!window.DTWCloud?.publishSharedContent)throw new Error('Cloud chưa sẵn sàng. Hãy tải lại trang rồi thử lại.');
-await window.DTWCloud.publishSharedContent({characters:data.characters,monsters:data.monsters,maps:data.maps,campaign:data.campaign,rouletteRewards:data.rouletteRewards});
+await window.DTWCloud.publishSharedContent({characters:withCloudImages(data.characters,'characters'),monsters:data.monsters,maps:withCloudImages(data.maps,'maps'),campaign:data.campaign,rouletteRewards:data.rouletteRewards});
 save();toast('Đã phát hành tỉ lệ vòng quay cho tất cả người chơi.','success');
 }catch(err){console.error('Save roulette settings failed:',err);toast('Không lưu được: '+(err?.message||'thử lại'),'error')}
 finally{btn.dataset.saving='0';btn.disabled=false;btn.textContent='Save & Publish'}
