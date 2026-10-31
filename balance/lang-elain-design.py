@@ -18,6 +18,6 @@ waves=[
  wave([g(S,8,1),g(W,4,1.5,3),g(K,2,3.5,4)],2.05*H,1.06,6),           # W11 tổng hợp
  wave([g(S,6,1.2),g(K,2,3,3),g(B,1,1,5)],2.3*H,1.1,3,boss=False),  # W12 Long Vương
 ]
-stage={"id":"stage1","name":"Làng Elian","mapId":"map1","difficulty":1,"lives":10,"gold":350,"reward":100,"waves":waves}
+stage={"id":"stage1","name":"Làng Elain","mapId":"map1","difficulty":1,"lives":10,"gold":350,"reward":100,"waves":waves}
 json.dump(stage,open('/tmp/claude-0/sim/stage.json','w'),ensure_ascii=False)
 print('total monsters',sum(w['count'] for w in waves))
